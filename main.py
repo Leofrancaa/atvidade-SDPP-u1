@@ -42,3 +42,45 @@ def process_parallel(numbers, num_threads):
     primes = [numbers[i] for i, is_p in enumerate(sorted_results) if is_p]
     return primes
 
+if __name__ == "__main__":
+    input_filename = "Entrada01.txt"
+    numbers = read_input(input_filename)
+
+    # Processamento Sequencial
+    start = time.time()
+    primes_seq = process_sequential(numbers)
+    time_seq = time.time() - start
+    write_output("Saida01Sequencial.txt", primes_seq)
+
+    # Processamento Paralelo com 5 threads
+    start = time.time()
+    primes_par5 = process_parallel(numbers, 5)
+    time_par5 = time.time() - start
+    write_output("Saida01Paralela5.txt", primes_par5)
+
+    # Processamento Paralelo com 10 threads
+    start = time.time()
+    primes_par10 = process_parallel(numbers, 10)
+    time_par10 = time.time() - start
+    write_output("Saida01Paralela10.txt", primes_par10)
+
+    # Gerar Relatório
+    with open("relatorio.txt", "w") as f:
+        f.write("Relatório de Desempenho\n\n")
+        f.write("Estratégia de Implementação:\n")
+        f.write("- Sequencial: Verifica cada número em ordem, um após o outro.\n")
+        f.write("- Paralela (5/10 threads): Utiliza ThreadPoolExecutor para distribuir tarefas entre threads, mantendo a ordem original via índices.\n\n")
+        f.write("Tempos de Execução:\n")
+        f.write(f"Sequencial: {time_seq:.4f} segundos\n")
+        f.write(f"Paralela (5 threads): {time_par5:.4f} segundos\n")
+        f.write(f"Paralela (10 threads): {time_par10:.4f} segundos\n\n")
+        f.write("Conclusão: Devido ao Global Interpreter Lock (GIL) do Python, o ganho de desempenho com threads é limitado para tarefas CPU-bound. O uso de multiprocessos seria mais eficaz.\n")
+
+    # Gerar Gráfico
+    labels = ['Sequencial', '5 Threads', '10 Threads']
+    times = [time_seq, time_par5, time_par10]
+    plt.bar(labels, times, color=['blue', 'green', 'red'])
+    plt.ylabel('Tempo (segundos)')
+    plt.title('Comparação de Desempenho')
+    plt.savefig('desempenho.png')
+    plt.close()
